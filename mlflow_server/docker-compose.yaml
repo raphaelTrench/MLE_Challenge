@@ -1,0 +1,33 @@
+version: "3.7"
+services:
+  db:
+    image: mysql
+    container_name: db
+    command: --innodb_use_native_aio=0
+    cap_add:
+      - SYS_NICE  # CAP_SYS_NICE
+    networks: 
+        - mlflow
+    environment:
+        - MYSQL_DATABASE=${MYSQL_DATABASE}
+        - MYSQL_USER=${MYSQL_USER}
+        - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+        - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+    volumes:
+        - ./dbdata:/var/lib/mysql
+  mlflow:
+    restart: always
+    image: mlflow-server
+    container_name: mlflow_server
+    ports:
+        - "5000:5000"
+    networks: 
+        - mlflow
+    volumes:
+        - ./mlruns:/mlruns
+    command: mlflow server --backend-store-uri mysql+pymysql://${MYSQL_USER}:${MYSQL_PASSWORD}@db:3306/${MYSQL_DATABASE} --default-artifact-root ./mlruns --host 0.0.0.0
+    depends_on: 
+        - db
+    
+networks:
+    mlflow:

@@ -127,3 +127,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# docker persist
+mlflow_server/dbdata
+project_automation/consul

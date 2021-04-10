@@ -1,0 +1,83 @@
+version: '3'
+
+services:
+  rabbitmq:
+    container_name: "rabbitmq"
+    image: rabbitmq:3-management
+    networks:
+    - rabbit_ml
+    ports:
+    - 5672:5672
+    - 5673:5673
+    - 15672:15672
+
+  dbserver:
+    image: mongo
+    container_name: "mongo"
+    restart: always
+    ports:
+    - 27017:27017
+    networks:
+    - rabbit_ml
+    volumes:
+    - mongodbdata:/data/db
+
+  ml_worker:
+    container_name: "ml_worker"
+    image: ml_worker
+    build: ./ml_worker
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+      - DB_HOST=dbserver
+      - HEART_BEAT_TIMEOUT=120
+      - BLOCKED_CONNECTION_TIMEOUT=300
+      - GOOGLE_APPLICATION_CREDENTIALS=${GOOGLE_APPLICATION_CREDENTIALS}
+      - MLFLOW_TRACKING_URI=${MLFLOW_TRACKING_URI}
+      - WORKER_QUEUE_NAME=${WORKER_QUEUE_NAME}
+      - INFERENCE_QUEUE_NAME=${INFERENCE_QUEUE_NAME}
+      - MODEL_NAME=${MODEL_NAME}
+    networks:
+      - rabbit_ml
+    depends_on:
+      - rabbitmq
+      - dbserver
+    restart: on-failure
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    volumes:
+      - ./ml_worker/app:/app
+
+  ml_server:
+      container_name: "ml_server"
+      image: ml_server
+      build: ./ml_server
+      ports:
+          - 8080:80
+      networks:
+          - rabbit_ml
+      restart: on-failure
+      depends_on:
+          - dbserver
+          - rabbitmq
+      environment:
+          - RABBITMQ_HOST=rabbitmq
+          - DB_HOST=dbserver
+          - HEART_BEAT_TIMEOUT=120
+          - BLOCKED_CONNECTION_TIMEOUT=300
+          - GOOGLE_APPLICATION_CREDENTIALS=${GOOGLE_APPLICATION_CREDENTIALS}
+          - MLFLOW_TRACKING_URI=${MLFLOW_TRACKING_URI}
+          - WORKER_QUEUE_NAME=${WORKER_QUEUE_NAME}
+          - INFERENCE_QUEUE_NAME=${INFERENCE_QUEUE_NAME}
+          - MODEL_NAME=${MODEL_NAME}
+      volumes:
+          - ./ml_server/app:/app
+      links:
+          - rabbitmq
+
+networks:
+    rabbit_ml:
+
+volumes:
+  mongodbdata:

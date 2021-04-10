@@ -1,0 +1,30 @@
+version: '2'
+services:
+ consul:
+   image: "consul"
+   hostname: "consul"
+   command: "agent -server -ui -node=server-1 -data-dir=/consul/data -bootstrap -client=0.0.0.0"
+   ports:
+     - "8500:8500"
+   volumes:
+     - ./consul:/consul/data
+  #  networks:
+  #   default:
+  #     external:
+  #       name: mlflow_server_mlflow
+ jenkins:
+    image: jenkins/jenkins:lts
+    privileged: true
+    user: root
+    ports:
+      - 8081:8080
+      - 50000:50000
+    container_name: jenkins
+    # networks:
+    #   default:
+    #     external:
+    #       name: mlflow_server_mlflow
+    volumes:
+      - ~/jenkins:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /usr/local/bin/docker:/usr/local/bin/docker

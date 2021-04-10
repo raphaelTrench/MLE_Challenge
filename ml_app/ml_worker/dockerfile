@@ -1,11 +1,14 @@
 FROM python:3.7-slim-buster
 
-COPY ./app /app
-
 COPY requirements.txt /app/
 
 RUN pip install -r /app/requirements.txt
 
 COPY ./credentials.json /gcp/credentials.json
+
+RUN apt-get update
+RUN apt-get install libgomp1
+
+COPY . /app
 
 CMD ["python", "./app/main.py"]

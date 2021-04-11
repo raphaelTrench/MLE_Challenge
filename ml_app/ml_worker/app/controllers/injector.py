@@ -1,13 +1,18 @@
 
 #!/usr/bin/env python
 import logging
+import os
+import pymongo
+
+logging.basicConfig(level=20)
 
 class Injector():
     def __init__(self):
-        pass
+        self.db_client = self._get_db_client()
+        self.logger = logging.getLogger()
 
+    def _get_db_client(self):
+        mongo_client = pymongo.MongoClient(
+            f"mongodb://{os.environ['DB_HOST']}:27017")
 
-#         myclient = pymongo.MongoClient("mongodb://" + dbHost + ":27017")
-# mydb = myclient["mydatabase"]
-# mycol = mydb["preddata"]
-# logging.basicConfig(level=20)
+        return mongo_client

@@ -36,6 +36,8 @@ services:
       - WORKER_QUEUE_NAME=${WORKER_QUEUE_NAME}
       - INFERENCE_QUEUE_NAME=${INFERENCE_QUEUE_NAME}
       - MODEL_NAME=${MODEL_NAME}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
     networks:
       - rabbit_ml
     depends_on:
@@ -61,6 +63,7 @@ services:
       depends_on:
           - dbserver
           - rabbitmq
+          - mlflow_server
       environment:
           - RABBITMQ_HOST=rabbitmq
           - DB_HOST=dbserver
@@ -71,6 +74,8 @@ services:
           - WORKER_QUEUE_NAME=${WORKER_QUEUE_NAME}
           - INFERENCE_QUEUE_NAME=${INFERENCE_QUEUE_NAME}
           - MODEL_NAME=${MODEL_NAME}
+          - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+          - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
       volumes:
           - ./ml_server/app:/app
       links:
@@ -91,7 +96,7 @@ services:
         - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
     volumes:
         - mysqldbdata:/var/lib/mysql
-
+  
   mlflow_server:
       restart: always
       build: ./mlflow_server
@@ -105,7 +110,10 @@ services:
           - rabbit_ml
       environment: 
           - GOOGLE_APPLICATION_CREDENTIALS=${GOOGLE_APPLICATION_CREDENTIALS}
-      command: mlflow server --backend-store-uri mysql+pymysql://${MYSQL_USER}:${MYSQL_PASSWORD}@mlflow_db:3306/${MYSQL_DATABASE} --default-artifact-root gs://mlflow-rt/mlflow/ --host 0.0.0.0
+          - MLFLOW_S3_ENDPOINT_URL=${MLFLOW_S3_ENDPOINT_URL}
+          - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+          - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      command: mlflow server --backend-store-uri mysql+pymysql://${MYSQL_USER}:${MYSQL_PASSWORD}@mlflow_db:3306/${MYSQL_DATABASE} --default-artifact-root ${ARTIFACT_BUCKET} --host 0.0.0.0
 
 networks:
     rabbit_ml:

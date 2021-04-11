@@ -9,16 +9,13 @@ import logging
 import traceback
 
 from controllers.queue import Queue
-from controllers.ml_pipeline import MLPipeline 
-
-logging.basicConfig(level=20)
+from controllers.ml_pipeline import MLPipeline
 
 def callback(ch, method, properties, body):
     logging.info(" [x] Received %r" % body.decode())
     message = json.loads(body)
     pipeline = MLPipeline(message)
     pipeline.demo_pipeline()
-
     logging.info(f"Finished!")
 
 def main():

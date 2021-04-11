@@ -1,8 +1,9 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, BackgroundTasks
 import pika
 import pymongo
 import uuid
 from pydantic import BaseModel
+from typing import List
 import uvicorn
 import threading
 import pika
@@ -12,6 +13,7 @@ import uuid
 import os
 from logging.config import dictConfig
 import logging
+import time
 import json
 
 
@@ -30,15 +32,23 @@ async def root():
     return {"message": "Hello Serasa!"}
 
 class InferenceBody(BaseModel):
-    data: list[float] = None
+    data_to_predict: List[dict] = None
 
 @app.post("/predict")
-def predict(payload: dict):
-    df = pd.DataFrame(payload,index=[0])
+def predict(data: InferenceBody, background_tasks: BackgroundTasks):
+    time_start = time.time()
+    df = pd.DataFrame(data.data_to_predict)
     logger.debug(f"Prediction for: {df}")
-    prediction = model.predict(df)
-    logger.debug(f"Predicted for: {prediction}")
-    return {"message": {"predictions" :  str(prediction)}}
+    predictions = model.predict(df)
+    logger.debug(f"Predicted for: {predictions}")
+
+    background_tasks.add_task(
+        model.log_predictions,
+        time_start,
+        df,
+        predictions)
+
+    return {"message": {"predictions" :  str(predictions)}}
 
 @app.get("/update/{model_version}")
 def update(model_version: int):

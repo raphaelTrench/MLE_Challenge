@@ -135,3 +135,6 @@ mlflow_server:5000/
 
 # gcp
 *credentials.json
+
+#ipy
+*.ipynb

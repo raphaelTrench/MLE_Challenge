@@ -40,12 +40,7 @@ class Queue(Injector):
         
         self.channel.queue_declare(
             queue=f'{self.queueName}-dlq', durable=True)
-
-        self.channel.basic_publish(
-            exchange='',
-             routing_key=f'{self.queueName}-dlq',
-              body='Hello World!')
-
+            
         logging.info(' [*] Waiting for messages. To exit press CTRL+C')
         self.channel.basic_qos(prefetch_count=1)
         self.channel.basic_consume(

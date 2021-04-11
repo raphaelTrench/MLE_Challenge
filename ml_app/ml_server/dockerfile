@@ -4,8 +4,6 @@ COPY requirements.txt /app/
 
 RUN pip install -r /app/requirements.txt
 
-COPY ./credentials.json /gcp/credentials.json
-
 RUN apt-get update
 RUN apt-get install libgomp1
 

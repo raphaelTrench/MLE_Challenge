@@ -14,8 +14,8 @@ from controllers.ml_pipeline import MLPipeline
 def callback(ch, method, properties, body):
     logging.info(" [x] Received %r" % body.decode())
     message = json.loads(body)
-    pipeline = MLPipeline(message)
-    pipeline.demo_pipeline()
+    pipeline = MLPipeline(message,pipeline_id=message.get('pipeline_id'))
+    pipeline.run_pipeline()
     logging.info(f"Finished!")
 
 def main():

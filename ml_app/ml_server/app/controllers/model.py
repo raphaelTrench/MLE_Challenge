@@ -74,7 +74,8 @@ class Model():
             "avg_time_prediction"  : time_per_prediction,
             "timestamp" : timestamp,
             "origin" : "api",
-            "total_batch_time" : time_elapsed
+            "total_batch_time" : time_elapsed,
+            "batch_size"  :  len(df)
             } for idx in range(len(df))]
         self._monitoring_db.insert_many(predictions_log)
         

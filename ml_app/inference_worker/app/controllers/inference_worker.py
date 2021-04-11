@@ -8,9 +8,9 @@ import time
 import datetime
 
 class InferenceWorker(Injector):
-    def __init__(self,inference_type,model_version):
+    def __init__(self,inference_type,model_version,model_name=None):
         super().__init__()
-        self._model_name = os.environ['MODEL_NAME']
+        self._model_name = model_name
         self._model_details  = None
         self._model = None
         self._model_udf = None
@@ -99,7 +99,8 @@ class InferenceWorker(Injector):
             "avg_time_prediction"  : time_per_prediction,
             "total_batch_time" : time_elapsed,
             "timestamp" : timestamp,
-            "origin"  :  "microservice"
+            "origin"  :  "microservice",
+            "batch_size" :  len(df)
             } for idx in range(len(df))]
         self._monitoring_db.insert_many(predictions)
         

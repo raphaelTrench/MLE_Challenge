@@ -16,7 +16,8 @@ def callback(ch, method, properties, body):
     message = json.loads(body)
     worker = InferenceWorker(
         inference_type=message.get('inference_type','standard'),
-        model_version=message.get('model_version',0)
+        model_version=message.get('model_version',0),
+        model_name=message['model_name']
     )
     data = message['data']
     worker.predict(data)

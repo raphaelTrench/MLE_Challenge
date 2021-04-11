@@ -33,15 +33,17 @@ services:
       - BLOCKED_CONNECTION_TIMEOUT=300
       - MLFLOW_TRACKING_URI=${MLFLOW_TRACKING_URI}
       - PIPELINE_QUEUE_NAME=${PIPELINE_QUEUE_NAME}
-      - MODEL_NAME=${MODEL_NAME}
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-      - MONITORING_COLLECTION=${MONITORING_COLLECTION}
+      - PIPELINE_MONITORING_COLLECTION=${PIPELINE_MONITORING_COLLECTION}
+      - KAGGLE_USERNAME=${KAGGLE_USERNAME}
+      - KAGGLE_KEY=${KAGGLE_KEY}
     networks:
       - rabbit_ml
     depends_on:
       - rabbitmq
       - dbserver
+      - mlflow_server
     restart: on-failure
     deploy:
       replicas: 1
@@ -59,11 +61,8 @@ services:
       - DB_HOST=dbserver
       - HEART_BEAT_TIMEOUT=120
       - BLOCKED_CONNECTION_TIMEOUT=300
-      - MONITORING_COLLECTION=${MONITORING_COLLECTION}
-      - INFERENCE_COLLECTION=${INFERENCE_COLLECTION}
       - MLFLOW_TRACKING_URI=${MLFLOW_TRACKING_URI}
       - INFERENCE_QUEUE_NAME=${INFERENCE_QUEUE_NAME}
-      - MODEL_NAME=${MODEL_NAME}
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
     networks:
@@ -71,6 +70,7 @@ services:
     depends_on:
       - rabbitmq
       - dbserver
+      - mlflow_server
     restart: on-failure
     deploy:
       replicas: 1
@@ -95,7 +95,6 @@ services:
       environment:
           - RABBITMQ_HOST=rabbitmq
           - DB_HOST=dbserver
-          - MONITORING_COLLECTION=${MONITORING_COLLECTION}
           - HEART_BEAT_TIMEOUT=120
           - BLOCKED_CONNECTION_TIMEOUT=300
           - MLFLOW_TRACKING_URI=${MLFLOW_TRACKING_URI}

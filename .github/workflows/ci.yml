@@ -7,6 +7,8 @@ on:
   # Triggers the workflow on push or pull request events but only for the main branch
   push:
     branches: [ main ]
+    paths:
+    
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -23,8 +25,72 @@ defaults:
     shell: bash
 
 jobs:
+  check:
+    name: Check files
+    outputs:
+      run_job_inference: ${{ steps.check_files.outputs.run_job_inference }}
+      run_job_ml_server: ${{ steps.check_files.outputs.run_job_ml_server }}
+      run_job_mlflow: ${{ steps.check_files.outputs.run_job_mlflow }}
+      run_job_pipeline: ${{ steps.check_files.outputs.run_job_pipeline }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
+
+      - name: check modified files
+        id: check_files
+        run: |
+          echo "=============== list modified files ==============="
+          git diff --name-only HEAD^ HEAD
+          
+          echo "========== check paths of modified files =========="
+          git diff --name-only HEAD^ HEAD > files.txt
+          while IFS= read -r file
+          do
+            echo $file
+            if [[ $file == ml_app/inference_worker/* ]]; then
+              echo "This modified file is under the 'ml_app/inference_worker' folder."
+              echo "::set-output name=run_job_inference::true"
+              break
+            else
+              echo "::set-output name=run_job_inference::false"
+            fi
+            
+            do
+            echo $file
+            if [[ $file == ml_app/inference_worker/* ]]; then
+              echo "This modified file is under the 'ml_app/ml_server' folder."
+              echo "::set-output name=run_job_ml_server::true"
+              break
+            else
+              echo "::set-output name=run_job_ml_server::false"
+            fi
+            
+            do
+            echo $file
+            if [[ $file == ml_app/inference_worker/* ]]; then
+              echo "This modified file is under the 'ml_app/pipeline_worker' folder."
+              echo "::set-output name=run_job_pipeline::true"
+              break
+            else
+              echo "::set-output name=run_job_pipeline::false"
+            fi
+            
+            do
+            echo $file
+            if [[ $file == ml_app/inference_worker/* ]]; then
+              echo "This modified file is under the 'ml_app/mlflow_server' folder."
+              echo "::set-output name=run_job_mlflow::true"
+              break
+            else
+              echo "::set-output name=run_job_mlflow::false"
+            fi
+          done < files.txt
   deploy:
-    name: Deploy
+    name: Deploy Inference
+    needs: check
     runs-on: ubuntu-latest
 
     steps:
@@ -48,6 +114,7 @@ jobs:
         env:
           ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
           IMAGE_TAG: ${{ github.sha }}
+        if: needs.check.outputs.run_job_inference == 'true'
         run: |
           # Build a docker container and
           # push it to ECR so that it can
@@ -62,6 +129,7 @@ jobs:
         env:
           ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
           IMAGE_TAG: ${{ github.sha }}
+        if: needs.check.outputs.run_job_ml_server == 'true'
         run: |
           # Build a docker container and
           # push it to ECR so that it can
@@ -76,6 +144,7 @@ jobs:
         env:
           ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
           IMAGE_TAG: ${{ github.sha }}
+        if: needs.check.outputs.run_job_mlflow == 'true'
         run: |
           # Build a docker container and
           # push it to ECR so that it can
@@ -90,6 +159,7 @@ jobs:
         env:
           ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
           IMAGE_TAG: ${{ github.sha }}
+        if: needs.check.outputs.run_job_pipeline == 'true'
         run: |
           # Build a docker container and
           # push it to ECR so that it can

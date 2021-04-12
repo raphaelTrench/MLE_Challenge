@@ -4,7 +4,7 @@
 
 This repo contains the architecture of services I have developed in order to automate every process in the ML cycle, **from  experimentation to deployment**. The main capabilities of the system are: 
 - Automating machine learning experimentation and training of diferent models, dynamically building and executing ML training pipelines for every training job submitted, where every experiment pipeline is defined by a very simple json message.  
-  In addition to that, this is done via a microservice using the AMQP protocol, meaning multiple jobs could be sent to a cluster running these workers at once, and these tasks would be queued up to be performed as resources become avaiable.  
+  In addition to that, this is done via a microservice using the AMQP protocol, meaning multiple jobs could be sent to a cluster running these workers at once, and these tasks would be queued up to be performed as resources become avaiable. Also making possible to scale workers if needed.
   Most importantly, each and every single experiment executed  by this worker will be throughly recorded using mlflow's model tracking server, also making it possible for the result  of a experiment to be "promoted" to production, using mlflow's model registry.  
 - Serving models for
   - Batch Prediction: By also using the AMQP protocol, predictions can be made for any size of data, as the workers responsible for inference can be scaled both  horizontally and vertically. With  mlflow, making model  predictions via spark udfs also becomes possible, increasing even more inference performance.
@@ -74,7 +74,7 @@ Example  of a pipeline  definition:
                     "trigonometry_features" :true
                 },
                 "modeling_params" : {
-                    "estimator_list" : ['rf','lightgbm','knn'],
+                    "estimator_list" : ["rf","lightgbm","knn"],
                     "fold" : 10,
                     "n_select"  : 2,
                     "tune" : false,
@@ -88,11 +88,11 @@ Example  of a pipeline  definition:
         ]}
     ],
     "experiment_config" : {
-        'experiment_name' : 'credit_fraud_202112',
-        'model_name' : 'credit_fraud',
-        'main_metric' : 'F1',
-        'problem_type':'classification',
-        'target' : 'Class'
+        "experiment_name" : "credit_fraud_202112",
+        "model_name" : "credit_fraud",
+        "main_metric" : "F1",
+        "problem_type":"classification",
+        "target" : "Class"
     }
 }
 ```
@@ -122,7 +122,7 @@ Another example of pipeline, showing how modular it they are, its building block
                     
                 },
                 "modeling_params" : {
-                    "estimator_list" : ['dt','lr'],
+                    "estimator_list" : ["dt","lr"],
                     "fold" : 2,
                     "n_select"  : 1,
                     "tune" : false,
@@ -132,11 +132,11 @@ Another example of pipeline, showing how modular it they are, its building block
         ]}
     ],
     "experiment_config" : {
-        'experiment_name' : 'test',
-        'model_name' : 'test',
-        'main_metric' : 'Kappa',
-        'problem_type':'classification',
-        'target' : 'Class'
+        "experiment_name" : "test",
+        "model_name" : "test",
+        "main_metric" : "Kappa",
+        "problem_type":"classification",
+        "target" : "Class"
     }
 }
 ```

@@ -98,7 +98,7 @@ Example  of a pipeline  definition:
 ```
 The pipeline above will:
 - Download training data directly from kaggle
-- Apply SMOTE to the data mitigate class imbalance
+- Apply SMOTE to the data to mitigate class imbalance
 - Apply PCA to the data
 - Create trigonometry features from its original features
 - Train Random Forest,LightGbm and a KNN model

@@ -141,7 +141,7 @@ Another example of pipeline, showing how modular it they are, its building block
 }
 ```
 
-When models are serialized to mlflow, **the whole feature engineering pipeline is also serialized with the model**. This means that regardless of the  transformations  made by pycaret during the training phase, they will be saved and executed seemlessly whenever the model is download from mlflow for executing predictions.
+When models are serialized to mlflow, **the whole feature engineering pipeline is also serialized with the model**. This means that regardless of the  transformations  made by pycaret during the training phase, they will be saved and executed seemlessly whenever the model is downloaded from mlflow for executing predictions.
 Lastly, to facilitate debugging and tracking of experiments, every pipeline ran  is also saved to a mongoDB collection.
 
 - ml_server  

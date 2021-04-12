@@ -89,7 +89,7 @@ jobs:
             fi
           done < files.txt
   deploy:
-    name: Deploy Inference
+    name: Deploy
     needs: check
     runs-on: ubuntu-latest
 

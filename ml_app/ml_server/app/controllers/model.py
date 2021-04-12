@@ -11,6 +11,9 @@ import time
 logger = logging.getLogger('custom-logger')
 
 class Model():
+    """Abstraction for the model  used by the API to serve predictions.
+    On startup,the actual model is loaded  from the registry. 
+    """
     def __init__(self):
         super().__init__()
         self._model_name  = os.environ['MODEL_NAME']
@@ -30,6 +33,7 @@ class Model():
         return mongo_client        
         
     def load_model(self,version=0):
+        "Searches model"
         client = MlflowClient()
         if(version):
             model_details  = [

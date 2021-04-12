@@ -8,10 +8,13 @@ import os
 import logging
 import traceback
 
-from app.controllers.queue import Queue
-from app.controllers.inference_worker import InferenceWorker
+from controllers.queue import Queue
+from controllers.inference_worker import InferenceWorker
 
 def callback(ch, method, properties, body):
+    """
+    Standard function to consume RabbitMQ Messages
+    """
     logging.info(" [x] Received %r" % body.decode())
     message = json.loads(body)
     worker = InferenceWorker(

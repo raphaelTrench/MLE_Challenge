@@ -6,9 +6,12 @@ import sys
 import os
 import logging
 
-from app.controllers.injector import Injector
+from controllers.injector import Injector
 
 class Queue(Injector):
+    """
+    Class  for abstracting queue logic
+    """
     def __init__(self):
         super().__init__()
         self.rabbitMQHost = os.environ.get("RABBITMQ_HOST")

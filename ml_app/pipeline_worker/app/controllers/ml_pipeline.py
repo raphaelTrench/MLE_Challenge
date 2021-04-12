@@ -1,6 +1,6 @@
 #!/usr/bin/env python
-from app.controllers.injector import Injector
-from app.controllers.ml_steps import MLSteps
+from controllers.injector import Injector
+from controllers.ml_steps import MLSteps
 
 import datetime
 import time
@@ -9,7 +9,67 @@ import mlflow
 import  traceback
 
 class MLPipeline(Injector):
+    """Dynamically builds ML pipelines based on the pipeline especification and experiment configurations received.
+    All experiments are directly logged to the mlflow tracking server,where they can be analyzed later.
+    If desired, then the best model resulting from the experiment session will also be registered in the model registry, to be used for
+    for inference by the API (ml_server) and the inference workers(inference_worker).
+    Lastly, this worker can also be used to solely register a desired model, given its run_id.
+    Example message body:
+    {
+        "pipeline":[
+            {
+                "MLSteps":[
+                    {
+                    "load_data_from_kaggle":{
+                        "kaggle_dataset_name":"mlg-ulb/creditcardfraud",
+                        "training_file_name":"creditcard.csv"
+                    }
+                    },
+                    {
+                    "train_model":{
+                        "feature_engineering_params":{
+                            "fix_imbalance":true
+                        },
+                        "modeling_params":{
+                            "estimator_list":[
+                                "dt",
+                                "lr"
+                            ],
+                            "fold":2,
+                            "n_select":2,
+                            "tune":false,
+                            "ensemble":true
+                        },
+                        "finalize":true
+                    }
+                    },
+                    {
+                    "register_model":{
+                        
+                    }
+                    }
+                ]
+            }
+        ],
+        "experiment_config":{
+            "experiment_name":"test",
+            "model_name":"test",
+            "main_metric":"F1",
+            "problem_type":"classification",
+            "target":"Class"
+        }
+    }
+
+    Args:
+        Injector ([type]): [description]
+    """
     def __init__(self, rabbit_message, pipeline_id):
+        """[summary]
+
+        Args:
+            rabbit_message ([type]): [description]
+            pipeline_id ([type]): [description]
+        """
         super().__init__()
         self._pipeline_id = pipeline_id or datetime.datetime.utcnow()
         self._worker_input = rabbit_message
@@ -61,6 +121,8 @@ class MLPipeline(Injector):
             upsert=True)
     
     def run_pipeline(self):
+        """Reads the pipeline specifications and runs each step according to the provided parameters
+        """
         start_time = time.time()
         self._save_pipeline_tracking(start_time)
         try:

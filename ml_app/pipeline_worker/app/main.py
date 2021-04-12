@@ -8,8 +8,8 @@ import os
 import logging
 import traceback
 
-from app.controllers.queue import Queue
-from app.controllers.ml_pipeline import MLPipeline
+from controllers.queue import Queue
+from controllers.ml_pipeline import MLPipeline
 
 def callback(ch, method, properties, body):
     logging.info(" [x] Received %r" % body.decode())

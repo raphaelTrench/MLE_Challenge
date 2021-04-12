@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from app.controllers.injector import Injector
+from controllers.injector import Injector
 import os
 import pandas as pd
 import mlflow
@@ -8,7 +8,18 @@ import time
 import datetime
 
 class InferenceWorker(Injector):
-    def __init__(self,inference_type,model_version,model_name=None):
+    """Worker responsible for making batch predictions and saving them.
+    The worker first loads the  selected  model from the registry,  and then performs
+    the predictiosn according to the selected method.
+    Tracking information is also saved.
+
+    Args:
+        inference_type ([str]): Methodology of how inference should be performed,
+        by using spark or executed by the worker.
+        model_version ([int]): Model version to be used for making predictions.
+        model_name ([str], optional): Model to be used from model registry.
+    """
+    def __init__(self,inference_type,model_version,model_name):
         super().__init__()
         self._model_name = model_name
         self._model_details  = None
@@ -82,6 +93,8 @@ class InferenceWorker(Injector):
         self._save_monitoring_data(predictions,timestamp,df[features],time_elapsed)
 
     def predict(self,data):
+        """Executes prediction according to the selected  method
+        """
         if(self._inference_type != "spark"):
             df = pd.DataFrame(data)
             self._standard_predict(df)
@@ -90,6 +103,9 @@ class InferenceWorker(Injector):
             self._spark_predict(spark_df)
 
     def _save_monitoring_data(self,predictions,timestamp,df,time_elapsed):
+        """
+        Saves information for tracking model performance.
+        """
         time_per_prediction = time_elapsed/len(df)
         predictions = [{
             "prediction" : float(predictions[idx]['prediction']),

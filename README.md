@@ -48,6 +48,8 @@ RabbitMQ is a message broker for implementing AMQP systems. With RabbitMQ, it be
 FastAPI is  a python API framework, created to have very high performance, going so far as to be on  par with NodeJS and Go.
 Performant and powerful, it was chosen as the component for serving model predictions online, mainly to offer low latency predictions.
 
+## Project Components
+
 The project is based on 4 different components, each located in its respective directory:
 - mlflow_server  
 The core component of the project, the mlflow  server is responsible for storing tracking information regarding model experiments and  registering and versioning models chosen to be used for production and uploading them to the components so the models can be served.

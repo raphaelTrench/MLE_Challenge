@@ -15,7 +15,10 @@ on:
 
 env:
   AWS_REGION: us-east-1                   # set this to your preferred AWS region, e.g. us-west-1
-  ECR_REPOSITORY: rt-ml-ops           # set this to your Amazon ECR repository name
+  INFERENCE_WORKER_REPOSITORY: inference_worker
+  ML_SERVER_REPOSITORY: ml_server
+  MLFLOW_SERVER_REPOSITORY: mlflow_server
+  PIPELINE_WORKER_REPOSITORY: pipeline_worker      
 
 defaults:
   run:
@@ -41,7 +44,7 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Build, tag, and push image to Amazon ECR
+      - name: (INFERENCE_WORKER) Build, tag, and push image to Amazon ECR
         id: build-inference_worker
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
@@ -51,11 +54,11 @@ jobs:
           # push it to ECR so that it can
           # be deployed to ECS.
           cd ml_app/inference_worker
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+          docker build -t $ECR_REGISTRY/$INFERENCE_WORKER_REPOSITORY:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$INFERENCE_WORKER_REPOSITORY:$IMAGE_TAG
+          echo "::set-output name=image::$ECR_REGISTRY/$INFERENCE_WORKER_REPOSITORY:$IMAGE_TAG"
           
-      - name: Build, tag, and push image to Amazon ECR
+      - name: (ML_SERVER) Build, tag, and push image to Amazon ECR
         id: build-ml-server
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
@@ -64,12 +67,12 @@ jobs:
           # Build a docker container and
           # push it to ECR so that it can
           # be deployed to ECS.
-          cd ml_app/ml_server
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+          cd ml_app/ml_server 
+          docker build -t $ECR_REGISTRY/$ML_SERVER_REPOSITORY:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$ML_SERVER_REPOSITORY:$IMAGE_TAG
+          echo "::set-output name=image::$ECR_REGISTRY/$ML_SERVER_REPOSITORY:$IMAGE_TAG"
       
-      - name: Build, tag, and push image to Amazon ECR
+      - name: (MLFLOW_SERVER) Build, tag, and push image to Amazon ECR
         id: build-mlflow-server
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
@@ -79,11 +82,11 @@ jobs:
           # push it to ECR so that it can
           # be deployed to ECS.
           cd ml_app/mlflow_server
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+          docker build -t $ECR_REGISTRY/$MLFLOW_SERVER_REPOSITORY:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$MLFLOW_SERVER_REPOSITORY:$IMAGE_TAG
+          echo "::set-output name=image::$ECR_REGISTRY/$MLFLOW_SERVER_REPOSITORY:$IMAGE_TAG"
       
-      - name: Build, tag, and push image to Amazon ECR
+      - name: (PIPELINE_WORKER) Build, tag, and push image to Amazon ECR
         id: build-pipeline-worker
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
@@ -93,6 +96,6 @@ jobs:
           # push it to ECR so that it can
           # be deployed to ECS.
           cd ml_app/pipeline_worker
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+          docker build -t $ECR_REGISTRY/$PIPELINE_WORKER_REPOSITORY:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$PIPELINE_WORKER_REPOSITORY:$IMAGE_TAG
+          echo "::set-output name=image::$ECR_REGISTRY/$PIPELINE_WORKER_REPOSITORY:$IMAGE_TAG"

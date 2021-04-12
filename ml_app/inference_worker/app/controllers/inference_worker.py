@@ -17,9 +17,9 @@ class InferenceWorker(Injector):
         self._inference_type = inference_type
 
         self._predictions_db = (
-            self.db_client[os.environ['MODEL_NAME']][os.environ['INFERENCE_COLLECTION']])
+            self.db_client[self._model_name]['INFERENCE'])
         self._monitoring_db = (
-            self.db_client[os.environ['MODEL_NAME']][os.environ['MONITORING_COLLECTION']])
+            self.db_client[self._model_name]['MONITORING'])
         self._load_model(model_version)
 
     def _load_model(self,version):
@@ -95,7 +95,7 @@ class InferenceWorker(Injector):
             "prediction" : float(predictions[idx]['prediction']),
             "model_input_signature" : self._model.metadata.signature.inputs.to_dict(),
             "feature_values" : {col:float(df.iloc[idx][col]) for col in df},
-            "model_run_id" : predictions['model_run_id'],
+            "model_run_id" : predictions[0]['model_run_id'],
             "avg_time_prediction"  : time_per_prediction,
             "total_batch_time" : time_elapsed,
             "timestamp" : timestamp,

@@ -29,8 +29,8 @@ services:
     environment:
       - RABBITMQ_HOST=rabbitmq
       - DB_HOST=dbserver
-      - HEART_BEAT_TIMEOUT=120
-      - BLOCKED_CONNECTION_TIMEOUT=300
+      - HEART_BEAT_TIMEOUT=3600
+      - BLOCKED_CONNECTION_TIMEOUT=3600
       - MLFLOW_TRACKING_URI=${MLFLOW_TRACKING_URI}
       - PIPELINE_QUEUE_NAME=${PIPELINE_QUEUE_NAME}
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
@@ -49,8 +49,8 @@ services:
       replicas: 1
       restart_policy:
         condition: on-failure
-    volumes:
-      - ./pipeline_worker/app:/app
+    # volumes:
+    #   - ./pipeline_worker/app:/app
 
   inference_worker:
     container_name: "inference_worker"
@@ -76,8 +76,6 @@ services:
       replicas: 1
       restart_policy:
         condition: on-failure
-    volumes:
-      - ./inference_worker/app:/app
 
   ml_server:
       container_name: "ml_server"
@@ -95,16 +93,12 @@ services:
       environment:
           - RABBITMQ_HOST=rabbitmq
           - DB_HOST=dbserver
-          - HEART_BEAT_TIMEOUT=120
-          - BLOCKED_CONNECTION_TIMEOUT=300
           - MLFLOW_TRACKING_URI=${MLFLOW_TRACKING_URI}
           - PIPELINE_QUEUE_NAME=${PIPELINE_QUEUE_NAME}
           - INFERENCE_QUEUE_NAME=${INFERENCE_QUEUE_NAME}
           - MODEL_NAME=${MODEL_NAME}
           - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
           - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-      volumes:
-          - ./ml_server/app:/app
       links:
           - rabbitmq
 

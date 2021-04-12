@@ -29,13 +29,10 @@ class MLSteps(Injector):
         temp_dir = tempfile.TemporaryDirectory()
 
         kaggle.api.authenticate()
-        kaggle.api.dataset_download_files('kaggle_dataset_name',
+        kaggle.api.dataset_download_files(kaggle_dataset_name,
          path=temp_dir.name,
          unzip=True)
         self.pipeline.training_data = pd.read_csv(os.path.join(temp_dir.name,training_file_name))
-
-    def validate_data(self):
-        return True
 
     def train_model(self,feature_engineering_params,modeling_params,finalize):
         mlflow.set_experiment(self.pipeline.experiment_name)
@@ -89,8 +86,8 @@ class MLSteps(Injector):
                 choose_better=True) for m in model]
 
         if(multiple_models and modeling_params.get('ensemble',False)):
-            blender = pyc.blend_models(model)
-            stacker = pyc.stack_models(model)
+            blender = pyc.blend_models(model,fold=modeling_params.get('fold',5))
+            stacker = pyc.stack_models(model,fold=modeling_params.get('fold',5))
 
         if(finalize):
             final = pyc.finalize_model(pyc.automl(self.pipeline.main_metric))

@@ -50,10 +50,10 @@ def predict(data: InferenceBody, background_tasks: BackgroundTasks):
 
     return {"message": {"predictions" :  str(predictions)}}
 
-@app.get("/update/{model_version}")
-def update(model_version: int):
-    if(model_version > 0):
-        message = model.load_model(model_version)
-    else:
-        message = model.load_model()
-    return {"message": message}
+# @app.get("/update/{model_version}")
+# def update(model_version: int):
+#     if(model_version > 0):
+#         message = model.load_model(model_version)
+#     else:
+#         message = model.load_model()
+#     return {"message": message}

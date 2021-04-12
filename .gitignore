@@ -138,4 +138,3 @@ mlflow_server:5000/
 *credentials.json
 
 #ipy
-*.ipynb

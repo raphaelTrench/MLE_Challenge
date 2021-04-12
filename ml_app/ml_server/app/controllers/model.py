@@ -19,7 +19,7 @@ class Model():
 
         self._db_client = self._get_db_client()
         self._monitoring_db = (
-            self._db_client[os.environ['MODEL_NAME']][os.environ['MONITORING_COLLECTION']])
+            self._db_client[self._model_name]['MONITORING'])
 
         self.load_model()
 

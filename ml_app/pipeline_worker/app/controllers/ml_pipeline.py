@@ -62,7 +62,7 @@ class MLPipeline(Injector):
     
     def run_pipeline(self):
         start_time = time.time()
-        self._save_pipeline_tracking(self,start_time)
+        self._save_pipeline_tracking(start_time)
         try:
             for step_phase in self._pipeline:
                 for step_type, steps in step_phase.items():
@@ -76,4 +76,6 @@ class MLPipeline(Injector):
             self._save_pipeline_tracking(start_time,end_time,"completed")
         except Exception:
             self._save_pipeline_tracking(start_time,status="fail",fail_log=traceback.format_exc())
+            self.logger.error(traceback.format_exc())
+            raise
 

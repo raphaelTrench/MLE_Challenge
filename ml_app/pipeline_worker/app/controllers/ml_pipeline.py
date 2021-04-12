@@ -1,6 +1,6 @@
 #!/usr/bin/env python
-from controllers.injector import Injector
-from controllers.ml_steps import MLSteps
+from app.controllers.injector import Injector
+from app.controllers.ml_steps import MLSteps
 
 import datetime
 import time

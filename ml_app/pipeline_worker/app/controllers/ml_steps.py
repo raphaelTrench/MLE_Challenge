@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from controllers.injector import Injector
+from app.controllers.injector import Injector
 from glob import glob
 import os
 import zipfile

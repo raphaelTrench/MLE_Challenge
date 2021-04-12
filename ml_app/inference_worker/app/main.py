@@ -8,8 +8,8 @@ import os
 import logging
 import traceback
 
-from controllers.queue import Queue
-from controllers.inference_worker import InferenceWorker
+from app.controllers.queue import Queue
+from app.controllers.inference_worker import InferenceWorker
 
 def callback(ch, method, properties, body):
     logging.info(" [x] Received %r" % body.decode())

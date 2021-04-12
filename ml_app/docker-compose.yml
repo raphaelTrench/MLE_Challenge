@@ -38,6 +38,7 @@ services:
       - PIPELINE_MONITORING_COLLECTION=${PIPELINE_MONITORING_COLLECTION}
       - KAGGLE_USERNAME=${KAGGLE_USERNAME}
       - KAGGLE_KEY=${KAGGLE_KEY}
+      - JENKINS_URL=${JENKINS_URL}/job/rabbit_ml/build?token=${JENKINS_TOKEN}
     networks:
       - rabbit_ml
     depends_on:
@@ -99,6 +100,8 @@ services:
           - MODEL_NAME=${MODEL_NAME}
           - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
           - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      # volumes:
+      #     -  ./ml_server/app:/app
       links:
           - rabbitmq
 

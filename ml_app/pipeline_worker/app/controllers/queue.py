@@ -6,7 +6,7 @@ import sys
 import os
 import logging
 
-from controllers.injector import Injector
+from app.controllers.injector import Injector
 
 class Queue(Injector):
     def __init__(self):

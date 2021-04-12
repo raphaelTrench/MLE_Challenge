@@ -17,12 +17,12 @@ import time
 import json
 
 
-from utils.log_config import get_config
+from app.utils.log_config import get_config
 
 dictConfig(get_config())
 app = FastAPI(debug=True)
 
-from controllers.model import Model
+from app.controllers.model import Model
 model = Model()
 
 logger = logging.getLogger('custom-logger')

@@ -1,0 +1,7 @@
+boto3==1.17.46
+mlflow==1.15.0
+cryptography==2.7
+pika==1.2.0
+pandas==1.2.3
+pymongo==3.11.3
+pycaret==2.3.0

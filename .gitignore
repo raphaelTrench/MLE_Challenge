@@ -131,3 +131,10 @@ dmypy.json
 # docker persist
 mlflow_server/dbdata
 project_automation/consul
+mlflow_server:5000/
+*.zip
+
+# gcp
+*credentials.json
+
+#ipy

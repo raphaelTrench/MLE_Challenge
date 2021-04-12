@@ -1,0 +1,146 @@
+version: '3'
+
+services:
+  rabbitmq:
+    container_name: "rabbitmq"
+    image: rabbitmq:3-management
+    networks:
+    - rabbit_ml
+    ports:
+    - 5672:5672
+    - 5673:5673
+    - 15672:15672
+
+  dbserver:
+    image: mongo
+    container_name: "mongo"
+    restart: always
+    ports:
+    - 27017:27017
+    networks:
+    - rabbit_ml
+    volumes:
+    - mongodbdata:/data/db
+
+  pipeline_worker:
+    container_name: "pipeline_worker"
+    image: pipeline_worker
+    build: ./pipeline_worker
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+      - DB_HOST=dbserver
+      - HEART_BEAT_TIMEOUT=3600
+      - BLOCKED_CONNECTION_TIMEOUT=3600
+      - MLFLOW_TRACKING_URI=${MLFLOW_TRACKING_URI}
+      - PIPELINE_QUEUE_NAME=${PIPELINE_QUEUE_NAME}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - PIPELINE_MONITORING_COLLECTION=${PIPELINE_MONITORING_COLLECTION}
+      - KAGGLE_USERNAME=${KAGGLE_USERNAME}
+      - KAGGLE_KEY=${KAGGLE_KEY}
+      - JENKINS_URL=${JENKINS_URL}/job/rabbit_ml/build?token=${JENKINS_TOKEN}
+    networks:
+      - rabbit_ml
+    depends_on:
+      - rabbitmq
+      - dbserver
+      - mlflow_server
+    restart: on-failure
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    # volumes:
+    #   - ./pipeline_worker/app:/app
+
+  inference_worker:
+    container_name: "inference_worker"
+    image: inference_worker
+    build: ./inference_worker
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+      - DB_HOST=dbserver
+      - HEART_BEAT_TIMEOUT=120
+      - BLOCKED_CONNECTION_TIMEOUT=300
+      - MLFLOW_TRACKING_URI=${MLFLOW_TRACKING_URI}
+      - INFERENCE_QUEUE_NAME=${INFERENCE_QUEUE_NAME}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+    networks:
+      - rabbit_ml
+    depends_on:
+      - rabbitmq
+      - dbserver
+      - mlflow_server
+    restart: on-failure
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
+  ml_server:
+      container_name: "ml_server"
+      image: ml_server
+      build: ./ml_server
+      ports:
+          - 8080:80
+      networks:
+          - rabbit_ml
+      restart: on-failure
+      depends_on:
+          - dbserver
+          - rabbitmq
+          - mlflow_server
+      environment:
+          - RABBITMQ_HOST=rabbitmq
+          - DB_HOST=dbserver
+          - MLFLOW_TRACKING_URI=${MLFLOW_TRACKING_URI}
+          - PIPELINE_QUEUE_NAME=${PIPELINE_QUEUE_NAME}
+          - INFERENCE_QUEUE_NAME=${INFERENCE_QUEUE_NAME}
+          - MODEL_NAME=${MODEL_NAME}
+          - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+          - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      # volumes:
+      #     -  ./ml_server/app:/app
+      links:
+          - rabbitmq
+
+  mlflow_db:
+    restart: always
+    image: mysql/mysql-server:5.7.28
+    container_name: mlflow_db
+    expose:
+        - "3306"
+    networks:
+        - rabbit_ml
+    environment:
+        - MYSQL_DATABASE=${MYSQL_DATABASE}
+        - MYSQL_USER=${MYSQL_USER}
+        - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+        - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+    volumes:
+        - mysqldbdata:/var/lib/mysql
+  
+  mlflow_server:
+      restart: always
+      build: ./mlflow_server
+      image: mlflow_server
+      container_name: mlflow_server
+      depends_on: 
+          - mlflow_db
+      ports:
+          - 5000:5000
+      networks:
+          - rabbit_ml
+      environment: 
+          - MLFLOW_S3_ENDPOINT_URL=${MLFLOW_S3_ENDPOINT_URL}
+          - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+          - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      command: mlflow server --backend-store-uri mysql+pymysql://${MYSQL_USER}:${MYSQL_PASSWORD}@mlflow_db:3306/${MYSQL_DATABASE} --default-artifact-root ${ARTIFACT_BUCKET} --host 0.0.0.0
+
+networks:
+    rabbit_ml:
+
+volumes:
+  mongodbdata:
+  mysqldbdata:

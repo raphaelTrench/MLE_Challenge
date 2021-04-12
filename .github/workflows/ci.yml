@@ -18,7 +18,7 @@ env:
   INFERENCE_WORKER_REPOSITORY: inference_worker
   ML_SERVER_REPOSITORY: ml_server
   MLFLOW_SERVER_REPOSITORY: mlflow_server
-  PIPELINE_WORKER_REPOSITORY: pipeline_worker      
+  PIPELINE_WORKER_REPOSITORY: pipeline_worker
 
 defaults:
   run:
@@ -36,7 +36,7 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }} 
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
@@ -47,7 +47,7 @@ jobs:
       - name: (INFERENCE_WORKER) Build, tag, and push image to Amazon ECR
         id: build-inference_worker
         env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
           IMAGE_TAG: ${{ github.sha }}
         run: |
           # Build a docker container and
@@ -61,7 +61,7 @@ jobs:
       - name: (ML_SERVER) Build, tag, and push image to Amazon ECR
         id: build-ml-server
         env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
           IMAGE_TAG: ${{ github.sha }}
         run: |
           # Build a docker container and
@@ -75,7 +75,7 @@ jobs:
       - name: (MLFLOW_SERVER) Build, tag, and push image to Amazon ECR
         id: build-mlflow-server
         env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
           IMAGE_TAG: ${{ github.sha }}
         run: |
           # Build a docker container and
@@ -89,7 +89,7 @@ jobs:
       - name: (PIPELINE_WORKER) Build, tag, and push image to Amazon ECR
         id: build-pipeline-worker
         env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
           IMAGE_TAG: ${{ github.sha }}
         run: |
           # Build a docker container and

@@ -36,6 +36,8 @@ At the same  time, mlflow's python module makes using these models for inference
 
 Pycaret is a low code ml library, full with functions to **quickly** easily engineer features,train, evaluate  and compare ml models for any  kind of problem. On its most recent versions, pycaret also gained compability with  mlflow, automatically logging its experiments, meaning metrics, model parameters,  plots  and even the model itself,  to  mlflow's tracking server.  
 
+![](images/pycaret.png)
+
 ### RabbitMQ
 
 RabbitMQ is a message broker for implementing AMQP systems. With RabbitMQ, it becomes possible to queue up requests to the system's microservices, which they  will consume as soon they becom  free. Another advantage is that each microservice listening to the queue will consume its messages  in  a round robin way, making possible and simple to scale a service horizontally.

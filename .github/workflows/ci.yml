@@ -58,8 +58,6 @@ jobs:
               echo "::set-output name=run_job_inference::false"
             fi
           
-            
-            echo $file
             if [[ $file == ml_app/inference_worker/* ]]; then
               echo "This modified file is under the 'ml_app/ml_server' folder."
               echo "::set-output name=run_job_ml_server::true"
@@ -68,8 +66,6 @@ jobs:
               echo "::set-output name=run_job_ml_server::false"
             fi
             
-            
-            echo $file
             if [[ $file == ml_app/inference_worker/* ]]; then
               echo "This modified file is under the 'ml_app/pipeline_worker' folder."
               echo "::set-output name=run_job_pipeline::true"
@@ -78,8 +74,6 @@ jobs:
               echo "::set-output name=run_job_pipeline::false"
             fi
             
-            
-            echo $file
             if [[ $file == ml_app/inference_worker/* ]]; then
               echo "This modified file is under the 'ml_app/mlflow_server' folder."
               echo "::set-output name=run_job_mlflow::true"

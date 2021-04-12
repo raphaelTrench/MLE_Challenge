@@ -59,6 +59,7 @@ The server stores its metadata in an sql server, while  storing  model artifacts
 The Pipeline worker is responsible for,  throught the use of mlflow and pycaret, consume ML experiment pipeline definitions and execute them.  
 This means that simply through a json message, multiple customized experiments can be sent to be executed  by the workers (which also  can  scale if needed), and every single time any model is evaluated  during these experiments, the results of them will be directly  logged to mlflow's server.  
 The different "pipeline steps" which make a  full pipeline are  meant to be modular, making this component  easily extensible for adding new steps and increase  the overall possibilities of experiments.  
+The `train_model` function parameters are directly mirrored from pycarets modules: [Classification](https://pycaret.org/classification/) and [Regression](https://pycaret.org/regression)
 
 Example  of a pipeline  definition:
 ```json

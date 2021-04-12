@@ -57,8 +57,8 @@ jobs:
             else
               echo "::set-output name=run_job_inference::false"
             fi
+          
             
-            do
             echo $file
             if [[ $file == ml_app/inference_worker/* ]]; then
               echo "This modified file is under the 'ml_app/ml_server' folder."
@@ -68,7 +68,7 @@ jobs:
               echo "::set-output name=run_job_ml_server::false"
             fi
             
-            do
+            
             echo $file
             if [[ $file == ml_app/inference_worker/* ]]; then
               echo "This modified file is under the 'ml_app/pipeline_worker' folder."
@@ -78,7 +78,7 @@ jobs:
               echo "::set-output name=run_job_pipeline::false"
             fi
             
-            do
+            
             echo $file
             if [[ $file == ml_app/inference_worker/* ]]; then
               echo "This modified file is under the 'ml_app/mlflow_server' folder."

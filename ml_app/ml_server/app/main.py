@@ -17,12 +17,12 @@ import time
 import json
 
 
-from app.utils.log_config import get_config
+from utils.log_config import get_config
 
 dictConfig(get_config())
 app = FastAPI(debug=True)
 
-from app.controllers.model import Model
+from controllers.model import Model
 model = Model()
 
 logger = logging.getLogger('custom-logger')
@@ -36,6 +36,18 @@ class InferenceBody(BaseModel):
 
 @app.post("/predict")
 def predict(data: InferenceBody, background_tasks: BackgroundTasks):
+    """Returns predictions for data in the payload.
+    After the prediction is  returned to the client, a background task is triggered
+    to save the predictions for future model  performance  tracking.
+
+    Args:
+        data (InferenceBody): [payload in the form of 
+        {
+            "data_to_predict": [
+                {[tabular features converted  to json in  records format]}
+            ]
+        }
+    """
     time_start = time.time()
     df = pd.DataFrame(data.data_to_predict)
     logger.debug(f"Prediction for: {df}")

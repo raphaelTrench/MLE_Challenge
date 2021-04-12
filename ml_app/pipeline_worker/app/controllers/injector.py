@@ -7,6 +7,8 @@ import pymongo
 logging.basicConfig(level=20)
 
 class Injector():
+    """Simple dependency injector
+    """
     def __init__(self):
         self.db_client = self._get_db_client()
         self.logger = logging.getLogger()

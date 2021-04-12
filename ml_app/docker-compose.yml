@@ -38,7 +38,6 @@ services:
       - PIPELINE_MONITORING_COLLECTION=${PIPELINE_MONITORING_COLLECTION}
       - KAGGLE_USERNAME=${KAGGLE_USERNAME}
       - KAGGLE_KEY=${KAGGLE_KEY}
-      - JENKINS_URL=${JENKINS_URL}/job/rabbit_ml/build?token=${JENKINS_TOKEN}
     networks:
       - rabbit_ml
     depends_on:
@@ -50,8 +49,6 @@ services:
       replicas: 1
       restart_policy:
         condition: on-failure
-    # volumes:
-    #   - ./pipeline_worker/app:/app
 
   inference_worker:
     container_name: "inference_worker"

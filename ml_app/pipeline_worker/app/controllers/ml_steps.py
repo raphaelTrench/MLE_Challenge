@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from app.controllers.injector import Injector
+from controllers.injector import Injector
 from glob import glob
 import os
 import zipfile
@@ -10,6 +10,8 @@ import kaggle
 from mlflow.tracking import MlflowClient
 
 class MLSteps(Injector):
+    """Class that contains  the "building blocks" that can be used to create the Machine Learning pipeline.
+    """
     def __init__(self,pipeline):
         super().__init__()
         self.pipeline = pipeline
@@ -35,6 +37,16 @@ class MLSteps(Injector):
         self.pipeline.training_data = pd.read_csv(os.path.join(temp_dir.name,training_file_name))
 
     def train_model(self,feature_engineering_params,modeling_params,finalize):
+        """Core funtion of the whole pipeline process, this method is responsible for running all experiments 
+        provided in the pipeline configurations, logging each and everyone of them to the model tracking server.
+
+        Args:
+            feature_engineering_params ([dict]): Params to  be  directly passed to pycarets "setup" function,
+            all  of  which regard data transformation  to  be  executed  by pycaret  before  fitting models.
+            modeling_params ([dict]): Params regarding the process of fitting models and their hyperparemeters.
+            finalize ([bool]): Flag indicating wheather the best model out  of all tested in this experiment run should
+            be registered, meaning "promoted" to  production.
+        """
         mlflow.set_experiment(self.pipeline.experiment_name)
 
         if(self.pipeline.problem_type == "classification"):
@@ -47,6 +59,7 @@ class MLSteps(Injector):
             target=self.pipeline.target,
             experiment_name=self.pipeline.experiment_name,
             silent=True,
+            log_plots=True,
             n_jobs=10,
             **feature_engineering_params
         )

@@ -55,7 +55,7 @@ The project is based on 4 different components, each located in its respective d
 The core component of the project, the mlflow  server is responsible for storing tracking information regarding model experiments and  registering and versioning models chosen to be used for production and uploading them to the components so the models can be served.
 The server stores its metadata in an sql server, while  storing  model artifacts in an AWS S3 remote bucket.
 
-- pipeline_worker
+- pipeline_worker  
 The Pipeline worker is responsible for,  throught the use of mlflow and pycaret, consume ML experiment pipeline definitions and execute them.  
 This means that simply through a json message, multiple customized experiments can be sent to be executed  by the workers (which also  can  scale if needed), and every single time any model is evaluated  during these experiments, the results of them will be directly  logged to mlflow's server.  
 The different "pipeline steps" which make a  full pipeline are  meant to be modular, making this component  easily extensible for adding new steps and increase  the overall possibilities of experiments.  
@@ -144,21 +144,21 @@ Another example of pipeline, showing how modular it they are, its building block
 ```
 
 When models are serialized to mlflow, **the whole feature engineering pipeline is also serialized with the model**. This means that regardless of the  transformations  made by pycaret during the training phase, they will be saved and executed seemlessly whenever the model is downloaded from mlflow for executing predictions.
-Lastly, to facilitate debugging and tracking of experiments, every pipeline ran  is also saved to a mongoDB collection.
+Lastly, to facilitate debugging and tracking of experiments, every pipeline ran  is also saved to a mongoDB collection.  
 
-- ml_server  
+- ml_server   
   
 Being used for online predictions, the  FastAPI server loads the desired  model from the registry, directly on startup. Predictions are  then served on its `/predict` endpoint. **After** each prediction is returned to the client, the predictions are saved to a mongodb collection, so as to make it possible to analyze model  performance later.   
 A screenshot of FastAPIs  interactive documentation page running the model:
 
 ![](images/fastapi.png)
 
-- inference_worker
+- inference_worker  
 For making offline,  batch predictions, again the microservice + message broker archictecture was used. Messages with the data points  to be  predicted are  sent to the queue,  with  multiple data points being sent at every message. The inference workers then make and save the predictions and tracking data for model analysis to mongoDB collections.   
-This way, it becomes possible to scale workers horizontally in order to scale the inference  capabilities  of the system  with  the amount of data.
+This way, it becomes possible to scale workers horizontally in order to scale the inference  capabilities  of the system  with  the amount of data.  
 
 ### CI/CD
-Whenever  the master branch is updated,  through github actions the docker images for each  component are built, tagged and pushed to AWS ECR.
+Whenever  the master branch is updated,  through github actions the docker images for each  component are built, tagged and pushed to AWS ECR.  
 
 ![](images/ecr.png)
 

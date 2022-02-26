@@ -1,5 +1,5 @@
 boto3==1.17.46
-mlflow==1.15.0
+mlflow==1.23.1
 pymysql==1.0.2
 cryptography==3.4.7
 pycaret==2.3.0
